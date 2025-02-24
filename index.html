@@ -2,51 +2,382 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Background Remover</title>
     <style>
-        .drop-zone {
-            border: 2px dashed #ccc;
-            padding: 2rem;
-            text-align: center;
+        /* Modern CSS Variables */
+        :root {
+            --bg-gradient: linear-gradient(to bottom right, #f8fafc, #f1f5f9);
+            --card-bg: white;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --accent-color: #3b82f6;
+            --accent-hover: #2563eb;
+            --border-color: #e2e8f0;
+            --success-color: #22c55e;
+            --error-color: #ef4444;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
+            --radius-lg: 12px;
+            --radius-full: 9999px;
+        }
+
+        .dark-mode {
+            --bg-gradient: linear-gradient(to bottom right, #0f172a, #1e293b);
+            --card-bg: #1e293b;
+            --text-primary: #f8fafc;
+            --text-secondary: #cbd5e1;
+            --border-color: #334155;
+        }
+
+        /* Modern Reset & Base Styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+        }
+
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            line-height: 1.5;
+            padding: 1.5rem;
+        }
+        .download-btn {
+        background: var(--accent-color);
+        color: white;
+        border: none;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--radius-lg);
+        font-weight: 500;
+        cursor: pointer;
+        margin-top: 1rem;
+        transition: transform 0.2s, background-color 0.2s;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .download-btn:hover {
+        background: var(--accent-hover);
+        transform: translateY(-1px);
+    }
+        /* Modern Card Container */
+        .container {
+            max-width: 800px;
             margin: 2rem auto;
-            width: 80%;
-            min-height: 200px;
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+
+        /* Modern Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            gap: 1rem;
+        }
+
+        h1 {
+            font-size: 1.875rem;
+            font-weight: 700;
+            background: linear-gradient(to right, var(--accent-color), var(--accent-hover));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Modern Theme Toggle */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            padding: 0.75rem;
+            border-radius: var(--radius-full);
+            cursor: pointer;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 500;
         }
+
+        .theme-toggle:hover {
+            background: var(--border-color);
+        }
+
+        /* Modern Drop Zone */
+        .drop-zone {
+            border: 2px dashed var(--border-color);
+            padding: 3rem 2rem;
+            text-align: center;
+            margin: 2rem 0;
+            border-radius: var(--radius-lg);
+            background-color: transparent;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .drop-zone::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--accent-color);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .drop-zone:hover::before {
+            opacity: 0.03;
+        }
+
         .drop-zone.dragover {
-            border-color: #007bff;
-            background-color: #f8f9fa;
+            border-color: var(--accent-color);
+            background-color: rgba(59, 130, 246, 0.05);
         }
+
+        .drop-zone-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Modern Upload Button */
+        .upload-btn {
+            background: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: var(--radius-lg);
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 1rem;
+            transition: transform 0.2s, background-color 0.2s;
+        }
+
+        .upload-btn:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        /* Modern Progress Bar */
+        .progress-container {
+            margin: 2rem 0;
+            display: none;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--border-color);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--accent-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Modern Result Container */
         #result {
             margin-top: 2rem;
-            text-align: center;
         }
+
+        #result img {
+            width: 100%;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            transition: transform 0.3s ease;
+        }
+
+        #result img:hover {
+            transform: scale(1.02);
+        }
+
+        /* Modern Toast Notifications */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 1rem 1.5rem;
+            border-radius: var(--radius-lg);
+            background: var(--card-bg);
+            box-shadow: var(--shadow-md);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: transform 0.3s, opacity 0.3s;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--error-color);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 640px) {
+            .container {
+                padding: 1.5rem;
+                margin: 1rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .drop-zone {
+                padding: 2rem 1rem;
+            }
+        }
+
         .hidden {
             display: none;
+        }
+        .image-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 2rem;
+        margin-top: 2rem;
+    }
+
+    .original-image,
+    .processed-image {
+        width: 100%;
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .image-box {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .image-box h3 {
+        color: var(--text-secondary);
+        font-size: 1rem;
+    }
+
+    @media (max-width: 768px) {
+        .image-container {
+            grid-template-columns: 1fr;
+        }
+    }
+        /* Icon Styles */
+        .icon {
+            width: 24px;
+            height: 24px;
+            stroke: currentColor;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            fill: none;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Drag & Drop Image Background Remover</h1>
+        <div class="header">
+            <h1>Background Remover</h1>
+            <button class="theme-toggle" id="themeToggle">
+                <svg class="icon" id="moonIcon" viewBox="0 0 24 24">
+                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                </svg>
+                <svg class="icon hidden" id="sunIcon" viewBox="0 0 24 24">
+                    <circle cx="12" cy="12" r="5"></circle>
+                    <line x1="12" y1="1" x2="12" y2="3"></line>
+                    <line x1="12" y1="21" x2="12" y2="23"></line>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                    <line x1="1" y1="12" x2="3" y2="12"></line>
+                    <line x1="21" y1="12" x2="23" y2="12"></line>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                </svg>
+            </button>
+        </div>
         
         <div class="drop-zone" id="dropZone">
-            <div>Drag & Drop your image here</div>
+            <div class="drop-zone-content">
+                <svg class="icon" style="width: 48px; height: 48px; margin: 0 auto 1rem; color: var(--accent-color);" viewBox="0 0 24 24">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+                <div class="drop-zone-text">Drop your image here</div>
+                <p style="color: var(--text-secondary); margin: 0.5rem 0;">or</p>
+                <button class="upload-btn">Choose File</button>
+            </div>
         </div>
         
         <input type="file" id="fileInput" class="hidden" accept="image/*">
-        
+
+        <div class="progress-container" id="progressContainer">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p style="text-align: center; margin-top: 0.75rem; color: var(--text-secondary);">Processing your image...</p>
+        </div>
+
         <div id="result"></div>
     </div>
 
+    <div class="toast" id="toast"></div>
+
     <script>
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        const moonIcon = document.getElementById('moonIcon');
+        const sunIcon = document.getElementById('sunIcon');
+        
+        function toggleTheme() {
+            document.body.classList.toggle('dark-mode');
+            moonIcon.classList.toggle('hidden');
+            sunIcon.classList.toggle('hidden');
+            localStorage.setItem('darkMode', document.body.classList.contains('dark-mode'));
+        }
+
+        // Check for saved theme preference
+        if (localStorage.getItem('darkMode') === 'true') {
+            toggleTheme();
+        }
+
+        themeToggle.addEventListener('click', toggleTheme);
+
+        // Toast Notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = `toast ${type} show`;
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // File Upload Handling
         const dropZone = document.getElementById('dropZone');
         const fileInput = document.getElementById('fileInput');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
         const resultDiv = document.getElementById('result');
 
-        // Drag & Drop handlers
         dropZone.addEventListener('click', () => fileInput.click());
         
         dropZone.addEventListener('dragover', (e) => {
@@ -78,29 +409,125 @@
             const formData = new FormData();
             formData.append('file', file);
 
+            progressContainer.style.display = 'block';
+            progressFill.style.width = '0%';
+
             try {
-                resultDiv.innerHTML = 'Processing...';
-                
+                // Simulate progress
+                let progress = 0;
+                const progressInterval = setInterval(() => {
+                    progress = Math.min(progress + 10, 90);
+                    progressFill.style.width = `${progress}%`;
+                }, 500);
+
                 const response = await fetch('/api/remove-bg', {
                     method: 'POST',
                     body: formData
                 });
+
+                clearInterval(progressInterval);
+                progressFill.style.width = '100%';
 
                 const data = await response.json();
                 
                 if (response.ok) {
                     const img = document.createElement('img');
                     img.src = `/result/${data.result_id}`;
-                    img.style.maxWidth = '100%';
+                    img.alt = 'Processed image';
                     resultDiv.innerHTML = '';
                     resultDiv.appendChild(img);
+                    showToast('Image processed successfully!', 'success');
                 } else {
-                    resultDiv.innerHTML = `Error: ${data.error}`;
+                    throw new Error(data.error || 'Failed to process image');
                 }
             } catch (error) {
-                resultDiv.innerHTML = `Error: ${error.message}`;
+                showToast(error.message, 'error');
+            } finally {
+                setTimeout(() => {
+                    progressContainer.style.display = 'none';
+                }, 1000);
             }
         }
+
+        async function processImage(file) {
+        const formData = new FormData();
+        formData.append('file', file);
+
+        // Hide drop zone and show original image
+        dropZone.style.display = 'none';
+        
+        // Create and show original image
+        const originalImage = URL.createObjectURL(file);
+        resultDiv.innerHTML = `
+            <div class="image-container">
+                <div class="image-box">
+                    <h3>Original Image</h3>
+                    <img src="${originalImage}" alt="Original" class="original-image">
+                </div>
+                <div class="image-box">
+                    <h3>Processed Image</h3>
+                    <div id="processedImage">
+                        <div class="progress-container" style="display: block;">
+                            <div class="progress-bar">
+                                <div class="progress-fill" id="progressFill"></div>
+                            </div>
+                            <p style="text-align: center; margin-top: 0.75rem; color: var(--text-secondary);">Processing your image...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+
+        try {
+            // Simulate progress
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress = Math.min(progress + 10, 90);
+                progressFill.style.width = `${progress}%`;
+            }, 500);
+
+            const response = await fetch('/api/remove-bg', {
+                method: 'POST',
+                body: formData
+            });
+
+            clearInterval(progressInterval);
+            progressFill.style.width = '100%';
+
+            if (response.ok) {
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            document.getElementById('processedImage').innerHTML = `
+                <img src="${imageUrl}" alt="Processed" class="processed-image">
+                <button onclick="downloadImage('${imageUrl}')" class="download-btn">
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Download Image
+                </button>
+            `;
+            showToast('Image processed successfully!', 'success');
+        }else {
+                const data = await response.json();
+                throw new Error(data.error || 'Failed to process image');
+            }
+        } catch (error) {
+            showToast(error.message, 'error');
+            // Show drop zone again on error
+            dropZone.style.display = 'block';
+            resultDiv.innerHTML = '';
+        }
+    }
+    function downloadImage(url) {
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'removed-background.png';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+    }
     </script>
 </body>
 </html>
