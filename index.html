@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Background Remover</title>
+    <style>
+        .drop-zone {
+            border: 2px dashed #ccc;
+            padding: 2rem;
+            text-align: center;
+            margin: 2rem auto;
+            width: 80%;
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .drop-zone.dragover {
+            border-color: #007bff;
+            background-color: #f8f9fa;
+        }
+        #result {
+            margin-top: 2rem;
+            text-align: center;
+        }
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Drag & Drop Image Background Remover</h1>
+        
+        <div class="drop-zone" id="dropZone">
+            <div>Drag & Drop your image here</div>
+        </div>
+        
+        <input type="file" id="fileInput" class="hidden" accept="image/*">
+        
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const resultDiv = document.getElementById('result');
+
+        // Drag & Drop handlers
+        dropZone.addEventListener('click', () => fileInput.click());
+        
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', async (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                await processImage(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', async () => {
+            if (fileInput.files.length > 0) {
+                await processImage(fileInput.files[0]);
+            }
+        });
+
+        async function processImage(file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+                resultDiv.innerHTML = 'Processing...';
+                
+                const response = await fetch('/api/remove-bg', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    const img = document.createElement('img');
+                    img.src = `/result/${data.result_id}`;
+                    img.style.maxWidth = '100%';
+                    resultDiv.innerHTML = '';
+                    resultDiv.appendChild(img);
+                } else {
+                    resultDiv.innerHTML = `Error: ${data.error}`;
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `Error: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>
