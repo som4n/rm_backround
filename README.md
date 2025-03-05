@@ -15,9 +15,56 @@ A web app for instantly removing image backgrounds using AI. Built with Python, 
 
 ![Demo Screenshot](demo-screenshot.png) *(Add a screenshot later)*
 
-## ✨ Features
-- Drag & drop image upload
-- AI-powered background removal
-- Real-time preview
-- Cross-platform compatibility
-- Lightweight and fast
+# Background Remover
+
+A web application that removes backgrounds from images using AI.
+
+## Features
+- Upload images via drag & drop or file selection
+- Real-time background removal
+- Dark/Light theme support
+- Download processed images
+- Progress tracking
+- Responsive design
+
+## Planned Improvements
+
+### Phase 1: Core Functionality
+- [ ] Add image size limits
+- [ ] Implement file type validation
+- [ ] Add better error handling
+- [ ] Optimize image processing speed
+
+### Phase 2: User Experience
+- [ ] Add loading animations
+- [ ] Implement image compression
+- [ ] Add batch processing for multiple images
+- [ ] Create image preview functionality
+
+### Phase 3: Advanced Features
+- [ ] Add processed images history
+- [ ] Implement share functionality
+- [ ] Add custom background replacement
+- [ ] Create user accounts system
+
+### Phase 4: Performance & Security
+- [ ] Implement rate limiting
+- [ ] Add CSRF protection
+- [ ] Optimize memory usage
+- [ ] Set up caching system
+
+### Phase 5: Infrastructure
+- [ ] Set up monitoring system
+- [ ] Implement logging
+- [ ] Add custom domain
+- [ ] Create backup system
+
+## Tech Stack
+- Frontend: HTML, CSS, JavaScript
+- Backend: Python, Flask
+- Image Processing: rembg
+- Deployment: Render
+
+## Current Status
+✅ Basic functionality implemented
+✅ Successfully deployed on Render
