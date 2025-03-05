@@ -7,6 +7,19 @@ import io
 app = Flask(__name__, static_url_path='')
 CORS(app)
 
+def optimize_image(image, max_size=1920):
+    # Maintain aspect ratio while resizing
+    width, height = image.size
+    if width > max_size or height > max_size:
+        if width > height:
+            new_width = max_size
+            new_height = int(height * (max_size / width))
+        else:
+            new_height = max_size
+            new_width = int(width * (max_size / height))
+        image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
+    return image
+
 @app.route('/')
 def index():
     return send_from_directory('.', 'index.html')
@@ -27,11 +40,19 @@ def remove_background():
     try:
         # Process image in memory
         input_image = Image.open(file.stream)
+        
+        # Optimize image before processing
+        input_image = optimize_image(input_image)
+        
+        # Convert to RGB if necessary
+        if input_image.mode != 'RGB':
+            input_image = input_image.convert('RGB')
+        
         output_image = remove(input_image)
         
-        # Save to bytes buffer instead of file
+        # Save to bytes buffer
         img_byte_arr = io.BytesIO()
-        output_image.save(img_byte_arr, format='PNG')
+        output_image.save(img_byte_arr, format='PNG', optimize=True)
         img_byte_arr.seek(0)
         
         return send_file(
