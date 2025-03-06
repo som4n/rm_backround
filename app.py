@@ -7,8 +7,7 @@ import io
 app = Flask(__name__, static_url_path='')
 CORS(app)
 
-def optimize_image(image, max_size=1920):
-    # Maintain aspect ratio while resizing
+def optimize_image(image, max_size=800):  # Reduced max size for memory efficiency
     width, height = image.size
     if width > max_size or height > max_size:
         if width > height:
@@ -20,14 +19,6 @@ def optimize_image(image, max_size=1920):
         image = image.resize((new_width, new_height), Image.Resampling.LANCZOS)
     return image
 
-@app.route('/')
-def index():
-    return send_from_directory('.', 'index.html')
-
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory('.', filename)
-
 @app.route('/api/remove-bg', methods=['POST'])
 def remove_background():
     if 'file' not in request.files:
@@ -36,25 +27,28 @@ def remove_background():
     file = request.files['file']
     if file.filename == '':
         return jsonify({'error': 'Empty filename'}), 400
+    
+    # Strict file size limit
+    MAX_FILE_SIZE = 5 * 1024 * 1024  # 5MB limit
+    file.seek(0, 2)  # Seek to end
+    size = file.tell()
+    if size > MAX_FILE_SIZE:
+        return jsonify({'error': 'File too large. Maximum size is 5MB'}), 400
+    file.seek(0)  # Reset file pointer
         
     try:
-        # Process image in memory
         input_image = Image.open(file.stream)
-        
-        # Optimize image before processing
         input_image = optimize_image(input_image)
         
-        # Convert to RGB if necessary
-        if input_image.mode != 'RGB':
-            input_image = input_image.convert('RGB')
-        
+        # Force garbage collection after each operation
         output_image = remove(input_image)
+        input_image.close()
         
-        # Save to bytes buffer
         img_byte_arr = io.BytesIO()
-        output_image.save(img_byte_arr, format='PNG', optimize=True)
-        img_byte_arr.seek(0)
+        output_image.save(img_byte_arr, format='PNG', optimize=True, quality=80)
+        output_image.close()
         
+        img_byte_arr.seek(0)
         return send_file(
             img_byte_arr,
             mimetype='image/png',
@@ -63,6 +57,13 @@ def remove_background():
         )
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+@app.route('/')
+def index():
+    return send_from_directory('.', 'index.html')
+
+@app.route('/<path:filename>')
+def serve_static(filename):
+    return send_from_directory('.', filename)
 
 if __name__ == '__main__':
     app.run(debug=True)
