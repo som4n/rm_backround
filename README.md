@@ -7,13 +7,15 @@
 A user-friendly web app for removing image backgrounds using AI. Built with Python, Flask, and the U²-Net model.
 
 A web app for instantly removing image backgrounds using AI. Built with Python, Flask, and the U²-Net model. Features:
-**Live Demo:** [Background Remover App](https://rm-backround-y977.onrender.com)
+
+# **Live Demo:** [Background Remover App](https://rm-backround-y977.onrender.com)
+
 * 🖱️ **Drag & Drop Interface** - Simple user-friendly UI
 * 🧠 **AI-Powered Removal** - Powered by `rembg` and U²-Net
 * ⚡ **Real-Time Processing** - Fast background removal in seconds
 * 🐍 **Python Backend** - Built with Flask for scalability
 
-![Demo Screenshot](demo-screenshot.png) *(Add a screenshot later)*
+![Demo Screenshot](demo-screenshot.png)
 
 # Background Remover
 
