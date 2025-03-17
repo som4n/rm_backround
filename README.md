@@ -35,7 +35,7 @@ A web application that removes backgrounds from images using AI.
 - [ ] Add image size limits
 - [ ] Implement file type validation
 - [ ] Add better error handling
-- [x] Optimize image processing speed
+- [ ] Optimize image processing speed
 
 ### Phase 2: User Experience
 - [ ] Add loading animations
