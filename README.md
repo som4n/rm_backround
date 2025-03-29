@@ -15,7 +15,7 @@ A web app for instantly removing image backgrounds using AI. Built with Python, 
 * ⚡ **Real-Time Processing** - Fast background removal in seconds
 * 🐍 **Python Backend** - Built with Flask for scalability
 
-![Demo Screenshot](demo-screenshot.png)
+![Demo Screenshot](Animation.gif)
 
 # Background Remover
 
